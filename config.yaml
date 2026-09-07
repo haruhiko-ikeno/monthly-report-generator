@@ -1,0 +1,17 @@
+# 月次帳票 自動生成ツール 設定ファイル
+company_name: サンプル株式会社
+
+# 対象会計年度（4月始まり〜翌年3月終わり）
+fiscal_year: 2025
+fiscal_start_month: 4
+
+# 差異分析の抽出しきい値（円）
+# 前月比でこの金額以上増減した勘定科目を抽出する
+variance_threshold: 100000
+
+# 入出力
+paths:
+  accounts: data/accounts.csv
+  departments: data/departments.csv
+  journal: data/journal.csv
+  output_dir: output

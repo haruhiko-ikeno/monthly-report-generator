@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# 生成物（generate_dummy_data.py で再生成できるため）
+data/journal.csv
+
+# 出力先（sample/ に代表例を1つ置いている）
+output/
+
+# macOS
+.DS_Store
