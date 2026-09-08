@@ -156,7 +156,9 @@ def variance_analysis(df, month, prev_month, threshold):
 def profit_by_department(df, months):
     """部門別損益表を作成する（部門 × 月、売上・費用・利益）
 
-    
+    収益科目と費用科目を大分類で分け、月ごとに残高を集計する。
+    残高の計算は _signed_balance() に任せているため、
+    借方科目・貸方科目の違いを個別に書き分ける必要はない。
     """
     records = []
 
@@ -164,20 +166,17 @@ def profit_by_department(df, months):
         name = sub["部門名"].iloc[0]
 
         
-        
-        revenue = sub[sub["大分類"]=="収益"]
-        expense = sub[sub["大分類"]=="費用"]
-
+        revenue = sub[sub["大分類"] == "収益"]
+        expense = sub[sub["大分類"] == "費用"]
 
         r_row = {"部門コード": dept, "部門名": name, "区分": "売上"}
         e_row = {"部門コード": dept, "部門名": name, "区分": "費用"}
         p_row = {"部門コード": dept, "部門名": name, "区分": "利益"}
 
         for m in months:
-            
-            rm = revenue[revenue["年月"]== m]
-            em = expense[expense["年月"]== m]
-          
+            rm = revenue[revenue["年月"] == m]
+            em = expense[expense["年月"] == m]
+
             r = _signed_balance(rm) if len(rm) > 0 else 0
             e = _signed_balance(em) if len(em) > 0 else 0
 
