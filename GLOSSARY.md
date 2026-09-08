@@ -11,18 +11,20 @@
 
 コード内の名前は、会計英語をそのまま使っています。
 
-| 英語 | 日本語 | 使用箇所 |
-|---|---|---|
-| account | 勘定科目 | `data/accounts.csv`（勘定科目マスタ） |
-| journal | 仕訳帳 | `data/journal.csv`（仕訳データ） |
-| debit / credit | 借方／貸方 | `借方金額` / `貸方金額` |
-| balance | 残高 | `_signed_balance()` |
-| trial balance | 試算表 | `trial_balance()` |
-| variance analysis | 差異分析 | `variance_analysis()` |
-| year on year (YoY) | 前年同期比 | `year_on_year()` |
-| fiscal year | 会計年度 | `fiscal_months()` |
-| department | 部門 | `data/departments.csv` |
-| master | マスタ | `load_masters()` |
+| 英語 | 読み | 日本語 | 使用箇所 |
+|---|---|---|---|
+| account | アカウント | 勘定科目 | `data/accounts.csv`（勘定科目マスタ） |
+| journal | ジャーナル | 仕訳帳 | `data/journal.csv`（仕訳データ） |
+| ledger | レジャー | 総勘定元帳 | ※参考（本ツールでは未使用） |
+| debit / credit | デビット／クレジット | 借方／貸方 | `借方金額` / `貸方金額` |
+| balance | バランス | 残高 | `_signed_balance()` |
+| trial balance | トライアル バランス | 試算表 | `trial_balance()` |
+| variance analysis | バリアンス アナリシス | 差異分析 | `variance_analysis()` |
+| year on year (YoY) | イヤー オン イヤー | 前年同期比 | `year_on_year()` |
+| fiscal year | フィスカル イヤー | 会計年度 | `fiscal_months()` |
+| department | ディパートメント | 部門 | `data/departments.csv` |
+| master | マスター | マスタ | `load_masters()` |
+| reconciliation | レコンシリエーション | 突合・照合 | マスタ突合の検証 |
 
 ### 貸借区分について
 
@@ -89,7 +91,7 @@
 
 ## 4. 設計上の用語
 
-### パイプライン (pipeline)
+### パイプライン (pipeline／パイプライン)
 
 複数の処理を順に繋ぎ、前の工程の出力を次の工程の入力とする構成のこと。
 本ツールは次の4工程で構成しています。
@@ -103,7 +105,7 @@ loader.py    loader.py   reports.py   excel_writer.py
 集計ロジックには影響しません。月次決算の実務（証憑回収 → 計上 → 照合 → 資料作成）も
 同じ構造をしています。
 
-### マスタ突合 (master reconciliation)
+### マスタ突合（マスタとつごう）
 
 仕訳データに現れるコードが、マスタに登録済みかを照合すること。
 `load_journal()` では、勘定科目コードと部門コードの両方について確認し、
@@ -117,12 +119,14 @@ loader.py    loader.py   reports.py   excel_writer.py
 
 ## 5. 使用ライブラリ
 
-| 名前 | 由来 | 用途 |
-|---|---|---|
-| pandas | panel data | 表形式データの集計 |
-| openpyxl | open + py + xl | Excelファイルの生成 |
-| PyYAML | Python + YAML | 設定ファイルの読み込み |
-| argparse | argument parser | コマンドライン引数の解釈 |
+| 名前 | 読み | 由来 | 用途 |
+|---|---|---|---|
+| pandas | パンダス | panel data | 表形式データの集計 |
+| openpyxl | オープンパイエックスエル | open + py + xl | Excelファイルの生成 |
+| PyYAML | パイヤムル | Python + YAML | 設定ファイルの読み込み |
+| argparse | アーグパース | argument parser | コマンドライン引数の解釈 |
+
+ファイル形式の読み方: `.csv` シーエスブイ / `.yaml` ヤムル / `.json` ジェイソン / `.md` エムディー
 
 ---
 
