@@ -168,14 +168,13 @@ def profit_by_department(df, months):
         #   ヒント: 大分類 列が "収益" の行に絞る
         #           sales_by_department() の絞り込みの書き方を参照
         # ------------------------------------------------------------------
-      　
-　　　　　　
+        
         revenue = sub[sub["大分類"]=="収益"]
 
         # ------------------------------------------------------------------
         # TODO② この部門の「費用」の行だけを取り出す
         # ------------------------------------------------------------------
-        expense =　sub[sub["大分類"]=="費用"]
+        expense = sub[sub["大分類"]=="費用"]
 
 
         r_row = {"部門コード": dept, "部門名": name, "区分": "売上"}
@@ -187,7 +186,7 @@ def profit_by_department(df, months):
             rm = revenue[revenue["年月"]== m]
             em = expense[expense["年月"]== m]
           
-          　 r = _signed_balance(rm) if len(rm) > 0 else 0
+            r = _signed_balance(rm) if len(rm) > 0 else 0
             e = _signed_balance(em) if len(em) > 0 else 0
 
             r_row[m] = int(r)
