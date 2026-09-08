@@ -168,32 +168,27 @@ def profit_by_department(df, months):
         #   ヒント: 大分類 列が "収益" の行に絞る
         #           sales_by_department() の絞り込みの書き方を参照
         # ------------------------------------------------------------------
-        revenue = None
+      　
+　　　　　　
+        revenue = sub[sub["大分類"]=="収益"]
 
         # ------------------------------------------------------------------
         # TODO② この部門の「費用」の行だけを取り出す
         # ------------------------------------------------------------------
-        expense = None
+        expense =　sub[sub["大分類"]=="費用"]
 
-        if revenue is None or expense is None:
-            raise NotImplementedError("TODO① と TODO② を埋めてください")
 
         r_row = {"部門コード": dept, "部門名": name, "区分": "売上"}
         e_row = {"部門コード": dept, "部門名": name, "区分": "費用"}
         p_row = {"部門コード": dept, "部門名": name, "区分": "利益"}
 
         for m in months:
-            # --------------------------------------------------------------
-            # TODO③ その月の売上と費用を求める
-            #   ヒント: 月で絞る       revenue[revenue["年月"] == m]
-            #           金額を求める   _signed_balance(絞り込んだ表)
-            #           _signed_balance は貸借区分を見て計算を切り替えるので、
-            #           収益にも費用にもそのまま使える
-            #   注意:   その月にデータが無いと空の表になるので、
-            #           空のときは 0 にする必要がある
-            # --------------------------------------------------------------
-            r = 0
-            e = 0
+            
+            rm = revenue[revenue["年月"]== m]
+            em = expense[expense["年月"]== m]
+          
+          　 r = _signed_balance(rm) if len(rm) > 0 else 0
+            e = _signed_balance(em) if len(em) > 0 else 0
 
             r_row[m] = int(r)
             e_row[m] = int(e)
