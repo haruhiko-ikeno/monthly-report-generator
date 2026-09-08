@@ -127,6 +127,10 @@ monthly-report-generator/
 読み込み・集計・出力を分離しているため、
 入力形式が変わっても `loader.py` の修正のみで対応できます。
 
+## 用語集
+
+コード内で使っている会計用語・略語の対応表を [GLOSSARY.md](GLOSSARY.md) にまとめています。
+
 ## 動作環境
 
 Python 3.9以上 / pandas / openpyxl / PyYAML
