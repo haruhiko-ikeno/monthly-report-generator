@@ -151,3 +151,57 @@ def variance_analysis(df, month, prev_month, threshold):
     if out.empty:
         return out
     return out.reindex(out["増減額"].abs().sort_values(ascending=False).index).reset_index(drop=True)
+
+
+def profit_by_department(df, months):
+    """部門別損益表を作成する（部門 × 月、売上・費用・利益）
+
+    ★TODO が3か所あります。埋めてから実行してください。
+    """
+    records = []
+
+    for dept, sub in df.groupby("部門コード"):
+        name = sub["部門名"].iloc[0]
+
+        # ------------------------------------------------------------------
+        # TODO① この部門の「収益」の行だけを取り出す
+        #   ヒント: 大分類 列が "収益" の行に絞る
+        #           sales_by_department() の絞り込みの書き方を参照
+        # ------------------------------------------------------------------
+        revenue = None
+
+        # ------------------------------------------------------------------
+        # TODO② この部門の「費用」の行だけを取り出す
+        # ------------------------------------------------------------------
+        expense = None
+
+        if revenue is None or expense is None:
+            raise NotImplementedError("TODO① と TODO② を埋めてください")
+
+        r_row = {"部門コード": dept, "部門名": name, "区分": "売上"}
+        e_row = {"部門コード": dept, "部門名": name, "区分": "費用"}
+        p_row = {"部門コード": dept, "部門名": name, "区分": "利益"}
+
+        for m in months:
+            # --------------------------------------------------------------
+            # TODO③ その月の売上と費用を求める
+            #   ヒント: 月で絞る       revenue[revenue["年月"] == m]
+            #           金額を求める   _signed_balance(絞り込んだ表)
+            #           _signed_balance は貸借区分を見て計算を切り替えるので、
+            #           収益にも費用にもそのまま使える
+            #   注意:   その月にデータが無いと空の表になるので、
+            #           空のときは 0 にする必要がある
+            # --------------------------------------------------------------
+            r = 0
+            e = 0
+
+            r_row[m] = int(r)
+            e_row[m] = int(e)
+            p_row[m] = int(r) - int(e)
+
+        for row in (r_row, e_row, p_row):
+            row["年度累計"] = sum(row[m] for m in months)
+            records.append(row)
+
+    out = pd.DataFrame(records)
+    return out.sort_values("部門コード", kind="stable").reset_index(drop=True)

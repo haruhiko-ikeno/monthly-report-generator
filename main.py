@@ -59,6 +59,7 @@ def main(argv=None):
     trend = reports.monthly_trend(df, months, section="PL")
     yoy = reports.year_on_year(df, months, prev_months, section="PL")
     dept_sales = reports.sales_by_department(df, months)
+    dept_profit = reports.profit_by_department(df, months)
     variance = reports.variance_analysis(df, month, prev_m, threshold)
 
     company = config["company_name"]
@@ -70,6 +71,7 @@ def main(argv=None):
          yoy, ("増減率",), None),
         ("部門別売上表", f"{company}　部門別売上表　{fy}年度", dept_sales, (),
          ("部門名", "合計")),
+        ("部門別損益表", f"{company}　部門別損益表　{fy}年度", dept_profit, (), None),
         ("差異分析", f"{company}　差異分析　{prev_m} → {month}"
          f"（増減 {threshold:,}円以上）", variance, ("増減率",), None),
     ]
@@ -87,6 +89,7 @@ def main(argv=None):
     print(f"  月次推移表   : {len(trend)} 科目 × 12ヶ月")
     print(f"  前年度比較表 : {len(yoy)} 科目")
     print(f"  部門別売上表 : {len(dept_sales) - 1} 部門")
+    print(f"  部門別損益表 : {len(dept_profit) // 3} 部門")
     print(f"  差異分析     : {len(variance)} 科目が {threshold:,}円以上増減")
     return 0
 
