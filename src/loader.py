@@ -29,10 +29,61 @@ def load_masters(base_dir, config):
     return accounts, departments
 
 
+def _apply_column_mapping(df, config):
+    """設定ファイルの対応表に従って、CSVの列名を内部名に読み替える
+
+    会計ソフトごとに列名が異なるため、この関数で差異を吸収する。
+    集計ロジック側は内部名しか知らないため、ソフトが変わっても
+    reports.py には手を入れなくてよい。
+    """
+    mapping = config.get("input", {}).get("column_mapping")
+    if not mapping:
+        return df  # 対応表がなければ内部名で書かれているものとみなす
+
+    # 対応表の右辺（実際の列名）が見つからない場合は、その時点で止める
+    not_found = [src for src in mapping.values() if src not in df.columns]
+    if not_found:
+        raise ValidationError(
+            "設定ファイルで指定された列がCSVに存在しません: "
+            f"{not_found} / CSVの列: {list(df.columns)}"
+        )
+
+    df = df.rename(columns={src: dst for dst, src in mapping.items()})
+    return df
+
+
+def _check_sign(df, config):
+    """借方・貸方の列を取り違えていないかを検査する
+
+    両列を入れ替えても貸借合計は一致したままで、他の検証を通過してしまう。
+    そこで収益科目をひとつ選び、貸方残高になっているかを確認する。
+    """
+    code = str(config.get("input", {}).get("sign_check_account", "")).strip()
+    if not code:
+        return
+    sub = df[df["勘定科目コード"] == code]
+    if sub.empty:
+        return
+    if sub["貸方金額"].sum() < sub["借方金額"].sum():
+        raise ValidationError(
+            f"収益科目（{code}）が借方残高になっています。"
+            "借方金額と貸方金額の列を取り違えている可能性があります。"
+            "config.yaml の column_mapping を確認してください。"
+        )
+
+
 def load_journal(base_dir, config, accounts, departments):
     """仕訳データを読み込み、マスタと突合したうえで検証する"""
     path = Path(base_dir) / config["paths"]["journal"]
-    df = pd.read_csv(path, dtype={"勘定科目コード": str, "伝票番号": str})
+    inp = config.get("input", {})
+    df = pd.read_csv(
+        path,
+        dtype=str,
+        encoding=inp.get("encoding", "utf-8-sig"),
+        sep=inp.get("delimiter", ","),
+    )
+
+    df = _apply_column_mapping(df, config)
 
     missing = [c for c in REQUIRED_JOURNAL_COLUMNS if c not in df.columns]
     if missing:
@@ -48,7 +99,10 @@ def load_journal(base_dir, config, accounts, departments):
     if diff != 0:
         raise ValidationError(f"仕訳全体の貸借が一致しません（差額 {diff:,} 円）")
 
-    # --- 検証2: 伝票単位の貸借一致 ---
+    # --- 検証2: 借方・貸方の取り違え検出 ---
+    _check_sign(df, config)
+
+    # --- 検証3: 伝票単位の貸借一致 ---
     by_voucher = df.groupby("伝票番号")[["借方金額", "貸方金額"]].sum()
     unbalanced = by_voucher[by_voucher["借方金額"] != by_voucher["貸方金額"]]
     if not unbalanced.empty:
@@ -57,7 +111,7 @@ def load_journal(base_dir, config, accounts, departments):
             f"{list(unbalanced.index[:5])}"
         )
 
-    # --- 検証3: マスタ未登録コードの検出 ---
+    # --- 検証4: マスタ未登録コードの検出 ---
     unknown_acct = set(df["勘定科目コード"]) - set(accounts["勘定科目コード"])
     if unknown_acct:
         raise ValidationError(f"勘定科目マスタに存在しないコード: {sorted(unknown_acct)}")
