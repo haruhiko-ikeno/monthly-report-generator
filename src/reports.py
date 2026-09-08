@@ -156,7 +156,7 @@ def variance_analysis(df, month, prev_month, threshold):
 def profit_by_department(df, months):
     """部門別損益表を作成する（部門 × 月、売上・費用・利益）
 
-    ★TODO が3か所あります。埋めてから実行してください。
+    
     """
     records = []
 
